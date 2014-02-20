@@ -40,6 +40,7 @@ class SnipeForm(Form):
     subject = TextField('Subject')
     course_number = TextField('Course Number', [validators.Length(min=2, max=4), validators.NumberRange()])
     section = TextField('Section', [validators.Length(min=1, max=4)])
+    checkbox = None
 
     def validate_subject(form, field):
         if not form.subject.data.isdigit():
@@ -74,15 +75,28 @@ class SnipeForm(Form):
 def home():
     """ Handles the home page rendering."""
 
-    return render_template('down.html')
-
     soc = Soc()
     subjects = soc.get_subjects()
 
     form = SnipeForm(request.form)
     if request.method == 'POST' and form.validate():
-        form.save()
-        return render_template('success.html', form=form)
+        if request.args.get('name') == 'snipe':
+            form.save()
+            return render_template('success.html', form=form)
+
+        if request.args.get('name') == 'sections':
+            req_sections = request.form.sections
+            chosen_sections = set(req_sections.split(',')) if ',' in req_sections else [req_sections]
+            courses = soc.get_courses()
+            sections = []
+            for course in courses():
+                for section in course:
+                    if section["index"] in chosen_sections:
+                        sections.append(section["index"])
+            choices = zip(range(1,len(sections)+1), sections)
+            form.checkbox = SelectMultipleField(choices=choices)
+            form.save()
+            return render_template('home.html', form=form, subjects=subjects, sections=sections)
     if not request.form:
         # this trick allows us to prepopulate entries using links sent out in emails.
         form = SnipeForm(request.args)

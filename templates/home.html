@@ -10,8 +10,14 @@
             {{ render_field(form.email) }}
             {{ render_field(form.subject, placeholder="Department Number. Ex: '640' for Math", autocomplete="off") }}
             {{ render_field(form.course_number) }}
-            {{ render_field(form.section) }}
+            {{ render_field(form.section, placeholder="Enter a section or a list of sections. Ex: '08938' or '39293,28239,28383'") }}
         </dl>
-        <button class="btn btn-primary" type="submit">Snipe</button>
+        <dl>
+            {% for section in sections %}
+                {{ render_field(form.checkbox) }} {{ form.section }}
+            {% endfor %}
+        </dl>
+        <button class="btn btn-primary" name="snipe" type="submit">Snipe</button>
+        <button class="btn btn-primary" name="sections" type="submit">Sections</button>
     </form>
 {% endblock %}

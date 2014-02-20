@@ -39,7 +39,7 @@ class Snipe(db.Model):
             self.user = user
         else:
             user = User(email)
-        
+
         self.subject = subject
         self.course_number = course_number
         self.section = section
